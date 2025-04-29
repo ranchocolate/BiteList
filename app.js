@@ -224,3 +224,7 @@ async function fetchMealsFromLLM(promptText) {
     return [];
   }
 }
+document.getElementById("fetchMealsBtn").addEventListener("click", () => {
+  console.log("Fetch button clicked!");
+});
+
