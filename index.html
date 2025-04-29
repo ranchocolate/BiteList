@@ -11,6 +11,33 @@
     <h1>Meal Planner</h1>
 
     <div class="controls">
+      <div class="checkbox-group">
+  <label>Diet:</label>
+  <div class="checkboxes" id="dietCheckboxes">
+    <label><input type="checkbox" value="gluten-free"> Gluten-Free</label>
+    <label><input type="checkbox" value="keto"> Keto</label>
+    <label><input type="checkbox" value="low-fodmap"> Low-FODMAP</label>
+    <label><input type="checkbox" value="nut-free"> Nut-Free</label>
+  </div>
+
+  <label>Meal Type:</label>
+  <div class="checkboxes" id="typeCheckboxes">
+    <label><input type="checkbox" value="breakfast"> Breakfast</label>
+    <label><input type="checkbox" value="lunch"> Lunch</label>
+    <label><input type="checkbox" value="dinner"> Dinner</label>
+    <label><input type="checkbox" value="snack"> Snack</label>
+  </div>
+
+  <label>Cuisine:</label>
+  <div class="checkboxes" id="cuisineCheckboxes">
+    <label><input type="checkbox" value="italian"> Italian</label>
+    <label><input type="checkbox" value="indian"> Indian</label>
+    <label><input type="checkbox" value="american"> American</label>
+    <label><input type="checkbox" value="mexican"> Mexican</label>
+  </div>
+
+  <button id="fetchMealsBtn">Fetch Meals from AI</button>
+</div>
       <select id="mealType">
         <option value="all">All Meal Types</option>
         <option value="breakfast">Breakfast</option>
