@@ -148,7 +148,6 @@ function displayMeals() {
     div.appendChild(btn);
     mealList.appendChild(div);
   });
-}
 
 function displayWeekPlan() {
   const container = document.getElementById("weekPlan");
