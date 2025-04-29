@@ -79,8 +79,21 @@ function buildMealPrompt(diets, types, cuisines) {
 });
 
 function displayMeals() {
-  const mealList = document.getElementById("mealList");
-  mealList.innerHTML = "";
+  const container = document.getElementById("available-meals");
+  container.innerHTML = "";
+
+  meals.forEach((meal, i) => {
+    const mealEl = document.createElement("div");
+    mealEl.className = "meal";
+    mealEl.innerHTML = `
+      <strong>${meal.name}</strong><br>
+      Type: ${meal.type} | Cuisine: ${meal.cuisine}<br>
+      Tags: ${meal.dietaryTags?.join(", ") || "None"}<br>
+      <button onclick="addMealToDay(${i})">Add to Day</button>
+    `;
+    container.appendChild(mealEl);
+  });
+}
 
   const type = document.getElementById("mealType").value;
   const cuisine = document.getElementById("cuisine").value;
@@ -193,8 +206,9 @@ function adjustQuantity(value, system, unit, servings) {
   }
   return { value: val.toFixed(1), unit };
 }
-async function fetchMealsFromLLM(promptText) {
-  const apiKey = "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"; // <-- Replace this with your key
+
+  async function fetchMealsFromLLM(promptText) {
+  const apiKey = "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"; // replace with your actual key
 
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
@@ -203,23 +217,34 @@ async function fetchMealsFromLLM(promptText) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "mistral/mistral-7b-instruct", // Free + good balance
+      model: "mistral/mistral-7b-instruct",
       messages: [
-        { role: "system", content: "You are a helpful meal planning assistant. Only respond with JSON." },
-        { role: "user", content: promptText }
+        {
+          role: "system",
+          content: "You are a meal planner AI. Respond ONLY with valid JSON. No extra commentary, no markdown.",
+        },
+        {
+          role: "user",
+          content: promptText
+        }
       ],
-      max_tokens: 1000,
+      max_tokens: 1200,
     }),
   });
 
   const data = await response.json();
+  const content = data.choices?.[0]?.message?.content || "";
 
   try {
-    const content = data.choices[0].message.content.trim();
-    const meals = JSON.parse(content); // Expecting valid JSON array
-    return meals;
+    // Extract array from full content if there's extra junk
+    const jsonStart = content.indexOf("[");
+    const jsonEnd = content.lastIndexOf("]");
+    const jsonText = content.substring(jsonStart, jsonEnd + 1);
+
+    const mealsFromAI = JSON.parse(jsonText);
+    return mealsFromAI;
   } catch (e) {
-    console.error("Failed to parse LLM response:", e, data);
+    console.error("AI response parse failed:", e, content);
     alert("AI response couldn't be understood. Try again or reduce filter complexity.");
     return [];
   }
