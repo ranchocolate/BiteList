@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meal Planner</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 50px;
+    }
+    .container {
+      width: 100%;
+      max-width: 1000px;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .filters {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .filters select {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      margin: 5px;
+      border: 1px solid #ddd;
+    }
+    .meal-day {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 10px;
+    }
+    .meal {
+      padding: 10px;
+      background-color: #fafafa;
+      margin-bottom: 5px;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    .meal-title {
+      font-weight: bold;
+    }
+    .grocery-list {
+      margin-top: 20px;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+    .grocery-list ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    .grocery-list li {
+      padding: 5px;
+      background-color: #fff;
+      margin-bottom: 5px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Meal Planner</h1>
+
+    <div class="filters">
+      <select id="mealType">
+        <option value="all">All Meal Types</option>
+        <option value="breakfast">Breakfast</option>
+        <option value="lunch">Lunch</option>
+        <option value="dinner">Dinner</option>
+        <option value="snack">Snack</option>
+      </select>
+      <select id="cuisine">
+        <option value="all">All Cuisines</option>
+        <option value="italian">Italian</option>
+        <option value="indian">Indian</option>
+        <option value="american">American</option>
+        <option value="mexican">Mexican</option>
+      </select>
+      <select id="dietaryRestriction">
+        <option value="all">No Restrictions</option>
+        <option value="glutenFree">Gluten-Free</option>
+        <option value="keto">Keto</option>
+        <option value="nutFree">Nut-Free</option>
+        <option value="fodmap">Low-FODMAP</option>
+      </select>
+      <input type="number" id="numServings" placeholder="Number of servings" value="2">
+    </div>
+
+    <div id="mealPlan">
+      <!-- Meal Plan Display -->
+    </div>
+
+    <div class="grocery-list">
+      <h2>Grocery List</h2>
+      <ul id="groceryList">
+        <!-- Grocery list items -->
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const meals = [
+      // Italian meals
+      {
+        name: "Spaghetti Carbonara",
+        type: "Dinner",
+        cuisine: "Italian",
+        ingredients: [
+          { item: "Spaghetti", quantity: "200g", department: "Pasta" },
+          { item: "Bacon", quantity: "100g", department: "Meat" },
+          { item: "Egg", quantity: "2", department: "Dairy" },
+          { item: "Parmesan", quantity: "50g", department: "Dairy" }
+        ],
+        dietaryTags: ["Gluten-Free"],
+      },
+      {
+        name: "Margherita Pizza",
+        type: "Dinner",
+        cuisine: "Italian",
+        ingredients: [
+          { item: "Pizza dough", quantity: "1", department: "Bakery" },
+          { item: "Mozzarella", quantity: "100g", department: "Dairy" },
+          { item: "Tomato sauce", quantity: "1/2 cup", department: "Canned Goods" },
+          { item: "Basil", quantity: "5 leaves", department: "Produce" }
+        ],
+        dietaryTags: ["Vegetarian"],
+      },
+      // Indian meals
+      {
+        name: "Chicken Tikka Masala",
+        type: "Dinner",
+        cuisine: "Indian",
+        ingredients: [
+          { item: "Chicken breast", quantity: "500g", department: "Meat" },
+          { item: "Tomato sauce", quantity: "1 cup", department: "Canned Goods" },
+          { item: "Yogurt", quantity: "0.5 cup", department: "Dairy" },
+          { item: "Spices mix", quantity: "2 tbsp", department: "Spices" }
+        ],
+        dietaryTags: ["Gluten-Free", "Nut-Free"],
+      },
+      // American meals
+      {
+        name: "Cheeseburger",
+        type: "Dinner",
+        cuisine: "American",
+        ingredients: [
+          { item: "Ground beef", quantity: "250g", department: "Meat" },
+          { item: "Cheese", quantity: "2 slices", department: "Dairy" },
+          { item: "Lettuce", quantity: "2 leaves", department: "Produce" },
+          { item: "Burger bun", quantity: "1", department: "Bakery" }
+        ],
+        dietaryTags: ["Nut-Free"],
+      },
+      // Mexican meals
+      {
+        name: "Chicken Tacos",
+        type: "Dinner",
+        cuisine: "Mexican",
+        ingredients: [
+          { item: "Chicken breast", quantity: "300g", department: "Meat" },
+          { item: "Taco shells", quantity: "4", department: "Bakery" },
+          { item: "Lettuce", quantity: "2 leaves", department: "Produce" },
+          { item: "Cheddar cheese", quantity: "50g", department: "Dairy" }
+        ],
+        dietaryTags: ["Gluten-Free"],
+      }
+    ];
+
+    // Function to generate meals based on selected filters
+    function generateMealPlan() {
+      const mealType = document.getElementById('mealType').value;
+      const cuisine = document.getElementById('cuisine').value;
+      const dietaryRestriction = document.getElementById('dietaryRestriction').value;
+      const numServings = document.getElementById('numServings').value;
+      
+      let filteredMeals = meals.filter(meal => {
+        return (mealType === 'all' || meal.type.toLowerCase() === mealType.toLowerCase()) &&
+               (cuisine === 'all' || meal.cuisine.toLowerCase() === cuisine.toLowerCase()) &&
+               (dietaryRestriction === 'all' || meal.dietaryTags.includes(dietaryRestriction));
+      });
+
+      // Adjust meal quantities based on servings
+      filteredMeals = filteredMeals.map(meal => {
+        meal.ingredients = meal.ingredients.map(ingredient => {
+          return { ...ingredient, quantity: (parseFloat(ingredient.quantity) * numServings / 2).toFixed(2) };
+        });
+        return meal;
+      });
+
+      // Display meal plan
+      const mealPlanContainer = document.getElementById('mealPlan');
+      mealPlanContainer.innerHTML = '';
+      filteredMeals.forEach(meal => {
+        const day = document.createElement('div');
+        day.className = 'meal-day';
+        const mealDiv = document.createElement('div');
+        mealDiv.className = 'meal';
+        mealDiv.innerHTML = `<div class="meal-title">${meal.name} (${meal.cuisine})</div>`;
+        meal.ingredients.forEach(ingredient => {
+          const ingredientDiv = document.createElement('div');
+          ingredientDiv.innerHTML = `${ingredient.item}: ${ingredient.quantity} (${ingredient.department})`;
+          mealDiv.appendChild(ingredientDiv);
+        });
+        day.appendChild(mealDiv);
+        mealPlanContainer.appendChild(day);
+      });
+
+      // Generate grocery list
+      generateGroceryList(filteredMeals);
+    }
+
+    // Function to generate grocery list
+    function generateGroceryList(filteredMeals) {
+      const groceryListContainer = document.getElementById('groceryList');
+      groceryListContainer.innerHTML = '';
+      
+      const groceryList = {};
+      filteredMeals.forEach(meal => {
+        meal.ingredients.forEach(ingredient => {
+          if (!groceryList[ingredient.department]) {
+            groceryList[ingredient.department] = [];
+          }
+          groceryList[ingredient.department].push(`${ingredient.item}: ${ingredient.quantity}`);
+        });
+      });
+
+      for (const department in groceryList) {
+        const departmentItem = document.createElement('li');
+        departmentItem.innerHTML = `<strong>${department}</strong>`;
+        groceryList[department].forEach(item => {
+          const itemDiv = document.createElement('li');
+          itemDiv.innerHTML = item;
+          departmentItem.appendChild(itemDiv);
+        });
+        groceryListContainer.appendChild(departmentItem);
+      }
+    }
+
+    // Event listeners for filtering
+    document.getElementById('mealType').addEventListener('change', generateMealPlan);
+    document.getElementById('cuisine').addEventListener('change', generateMealPlan);
+    document.getElementById('dietaryRestriction').addEventListener('change', generateMealPlan);
+    document.getElementById('numServings').addEventListener('input', generateMealPlan);
+
+    // Initial generation
+    generateMealPlan();
+  </script>
+
+</body>
+</html>
