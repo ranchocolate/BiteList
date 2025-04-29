@@ -39,6 +39,43 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("unitSystem").addEventListener("change", displayMeals);
   displayMeals();
   displayWeekPlan();
+  document.getElementById("fetchMealsBtn").addEventListener("click", async () => {
+  const diets = getCheckedValues("dietCheckboxes");
+  const types = getCheckedValues("typeCheckboxes");
+  const cuisines = getCheckedValues("cuisineCheckboxes");
+
+  const prompt = buildMealPrompt(diets, types, cuisines);
+  const meals = await fetchMealsFromLLM(prompt);
+
+  if (meals.length > 0) {
+    meals.forEach(m => meals.push(m)); // Append or replace meals as needed
+    displayMeals();
+  } else {
+    alert("No meals returned from AI. Try fewer filters.");
+  }
+});
+
+function getCheckedValues(id) {
+  const checkboxes = document.getElementById(id).querySelectorAll("input[type=checkbox]");
+  return Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+}
+
+function buildMealPrompt(diets, types, cuisines) {
+  const parts = [];
+
+  if (diets.length) parts.push(`${diets.join(", ")} diet`);
+  if (cuisines.length) parts.push(`${cuisines.join(", ")} cuisine`);
+  if (types.length) parts.push(`${types.join(", ")} meals`);
+  else parts.push("meals");
+
+  return `Give me 8 ${parts.join(" ")} suitable for 2 servings. Return as a JSON array. Each meal should include:
+- name
+- type
+- cuisine
+- dietaryTags (array)
+- ingredients (array with item, quantity [in grams or ml], unit, department).`;
+}
+
 });
 
 function displayMeals() {
@@ -155,4 +192,35 @@ function adjustQuantity(value, system, unit, servings) {
     if (unit === "ml") return { value: (val * 0.0042).toFixed(1), unit: "cups" };
   }
   return { value: val.toFixed(1), unit };
+}
+async function fetchMealsFromLLM(promptText) {
+  const apiKey = "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"; // <-- Replace this with your key
+
+  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "mistral/mistral-7b-instruct", // Free + good balance
+      messages: [
+        { role: "system", content: "You are a helpful meal planning assistant. Only respond with JSON." },
+        { role: "user", content: promptText }
+      ],
+      max_tokens: 1000,
+    }),
+  });
+
+  const data = await response.json();
+
+  try {
+    const content = data.choices[0].message.content.trim();
+    const meals = JSON.parse(content); // Expecting valid JSON array
+    return meals;
+  } catch (e) {
+    console.error("Failed to parse LLM response:", e, data);
+    alert("AI response couldn't be understood. Try again or reduce filter complexity.");
+    return [];
+  }
 }
