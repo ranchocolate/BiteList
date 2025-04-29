@@ -83,3 +83,17 @@ body {
 .checkboxes input {
   accent-color: #333;
 }
+.query-builder {
+  border: 2px solid #ddd;
+  padding: 16px;
+  border-radius: 12px;
+  background-color: #fafafa;
+  margin: 20px 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.query-builder h2 {
+  font-size: 1.2rem;
+  margin-bottom: 12px;
+  color: #333;
+}
